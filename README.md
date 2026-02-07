@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![LG Logo](https://www.liquidgalaxy.eu/wp-content/uploads/2020/02/logo-liquid-galaxy.png)
+![LG Logo](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjzI4JzY6oUy-dQaiW-HLmn5NQ7qiw7NUOoK-2cDU9cI6JwhPrNv0EkCacuKWFViEgXYrCFzlbCtHZQffY6a73j6_ATFjfeU7r6OxXxN5K8sGjfOlp3vvd6eCXZrozlu34fUG5_cKHmzZWa4axb-vJRKjLr2tryz0Zw30gTv3S0ET57xsCiD25WMPn3wA/s800/LIQUIDGALAXYLOGO.png)
 
 **A Flutter application for exploring cities around the world on Liquid Galaxy**
 
@@ -11,6 +11,11 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
 
 </div>
+
+## Demo 
+
+https://github.com/user-attachments/assets/59897c98-15d1-4a86-a6d5-99aa40ace31e
+
 
 ## Overview
 
