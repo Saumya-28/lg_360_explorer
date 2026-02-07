@@ -1,10 +1,10 @@
-# Liquid Galaxy GSoC 2026 Flutter Starter Kit
+# LG Explorer 360
 
 <div align="center">
 
 ![LG Logo](https://www.liquidgalaxy.eu/wp-content/uploads/2020/02/logo-liquid-galaxy.png)
 
-**A production-ready Flutter starter kit for Google Summer of Code 2026 Liquid Galaxy projects**
+**A Flutter application for exploring cities around the world on Liquid Galaxy**
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.0+-blue.svg)](https://flutter.dev/)
 [![Dart](https://img.shields.io/badge/Dart-3.0+-blue.svg)](https://dart.dev/)
@@ -14,17 +14,18 @@
 
 ## 🌟 Overview
 
-This starter kit provides a complete, production-ready foundation for building Liquid Galaxy applications using Flutter. It features **Clean Architecture**, **Riverpod state management**, **SSH connectivity via dartssh2**, and an innovative **Agentic AI skill system** to guide development.
+LG Explorer 360 is a Flutter application that enables immersive city exploration on Liquid Galaxy rigs. Built with **Clean Architecture**, **Riverpod state management**, and **SSH connectivity via dartssh2**, it provides a seamless way to fly to cities, display information balloons, and visualize content across multiple screens.
 
 ### Key Features
 
-- ✅ **Clean Architecture** - Domain, Data, Presentation layers
+- ✅ **City Exploration** - Fly to major cities around the world with preset locations
+- ✅ **Multi-Screen KML** - Display logos on left screen and balloons on right screen
+- ✅ **Clean Architecture** - Domain, Data, Presentation layers for maintainability
 - ✅ **Riverpod State Management** - Type-safe, testable state handling
 - ✅ **LG SSH Connection** - Secure communication with Liquid Galaxy rig
 - ✅ **KML Builder Utilities** - Easy KML generation for visualizations
-- ✅ **Agentic AI Skills** - 6 AI agents to guide your development workflow
-- ✅ **Error Handling** - Functional error handling with Either type
-- ✅ **Demo Screens** - Connection UI and KML demonstration examples
+- ✅ **Information Balloons** - Display rich HTML content with city information
+- ✅ **LG Operations** - Reboot, clear visualizations, and manage the rig
 
 ## 🏗️ Architecture
 
@@ -61,7 +62,7 @@ lib/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/lg_gemini_starter_kmp.git
+   git clone <repository-url>
    cd lg_gemini_starter_kmp/starter_app
    ```
 
@@ -101,9 +102,9 @@ LG_PASSWORD=your_password
 LG_SCREEN_COUNT=5
 ```
 
-## 🤖 Agentic AI Skills System
+## 🤖 Agentic AI Skills System (Development Tools)
 
-This starter kit includes 6 AI agent skills to guide your development workflow:
+This project includes 6 AI agent skills to guide development and future enhancements:
 
 ### 1. **Init Agent** (`01_init.md`)
 Guides project initialization and LG configuration setup.
@@ -272,10 +273,11 @@ This project is licensed under the Apache License 2.0 - see the LICENSE file for
 
 ## 🙏 Acknowledgments
 
-- Liquid Galaxy LAB for the amazing platform
-- Google Summer of Code for the opportunity
+- Liquid Galaxy LAB for the amazing platform and support
+- Google Summer of Code 2026 program
 - Flutter team for the excellent framework
 - Riverpod community for state management guidance
+- Contributors and testers who helped improve this application
 
 ## 📧 Contact
 
