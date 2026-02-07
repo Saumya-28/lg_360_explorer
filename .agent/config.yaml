@@ -1,0 +1,4 @@
+# Antigravity Configuration
+agent:
+  name: Antigravity
+  version: 1.0.0

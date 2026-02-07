@@ -1,0 +1,29 @@
+name: lg_explorer_360
+description: "LG Explorer 360 - A Liquid Galaxy Flutter application for exploring cities."
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  provider: ^6.1.1
+  flutter_riverpod: ^2.4.9
+  dartssh2: ^2.6.1
+  path_provider: ^2.1.2
+  shared_preferences: ^2.2.2
+  equatable: ^2.0.5
+  logger: ^2.0.0
+  dartz: ^0.10.1
+  google_fonts: ^8.0.1
+  http: ^1.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
