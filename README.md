@@ -12,22 +12,22 @@
 
 </div>
 
-## 🌟 Overview
+## Overview
 
 LG Explorer 360 is a Flutter application that enables immersive city exploration on Liquid Galaxy rigs. Built with **Clean Architecture**, **Riverpod state management**, and **SSH connectivity via dartssh2**, it provides a seamless way to fly to cities, display information balloons, and visualize content across multiple screens.
 
 ### Key Features
 
-- ✅ **City Exploration** - Fly to major cities around the world with preset locations
-- ✅ **Multi-Screen KML** - Display logos on left screen and balloons on right screen
-- ✅ **Clean Architecture** - Domain, Data, Presentation layers for maintainability
-- ✅ **Riverpod State Management** - Type-safe, testable state handling
-- ✅ **LG SSH Connection** - Secure communication with Liquid Galaxy rig
-- ✅ **KML Builder Utilities** - Easy KML generation for visualizations
-- ✅ **Information Balloons** - Display rich HTML content with city information
-- ✅ **LG Operations** - Reboot, clear visualizations, and manage the rig
+- **City Exploration** - Fly to major cities around the world with preset locations
+- **Multi-Screen KML** - Display logos on left screen and balloons on right screen
+- **Clean Architecture** - Domain, Data, Presentation layers for maintainability
+- **Riverpod State Management** - Type-safe, testable state handling
+- **LG SSH Connection** - Secure communication with Liquid Galaxy rig
+- **KML Builder Utilities** - Easy KML generation for visualizations
+- **Information Balloons** - Display rich HTML content with city information
+- **LG Operations** - Reboot, clear visualizations, and manage the rig
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 lib/
@@ -49,7 +49,7 @@ lib/
     └── utils/           # Utility classes (KMLBuilder)
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -78,7 +78,7 @@ lib/
    flutter run -d macos
    ```
 
-## 🔧 Configuration
+## Configuration
 
 ### LG Connection Setup
 
@@ -102,7 +102,7 @@ LG_PASSWORD=your_password
 LG_SCREEN_COUNT=5
 ```
 
-## 🤖 Agentic AI Skills System (Development Tools)
+## Agentic AI Skills System (Development Tools)
 
 This project includes 6 AI agent skills to guide development and future enhancements:
 
@@ -120,10 +120,10 @@ Implements features following Clean Architecture and SOLID principles.
 
 ### 5. **Review Agent** (`05_review.md`)
 Performs strict code reviews checking for:
-- ❌ Hardcoded strings
-- 🚫 Main thread blocking
-- ⚠️ Missing KML headers
-- ✅ SOLID principles compliance
+- Hardcoded strings
+- Main thread blocking
+- Missing KML headers
+- SOLID principles compliance
 
 ### 6. **Quiz Agent** (`06_quiz.md`)
 Validates understanding through educational assessments.
@@ -132,7 +132,7 @@ Validates understanding through educational assessments.
 
 Navigate to `.agent/skills/` and read the skill files to understand each agent's role. Use them as prompts when working with AI coding assistants.
 
-## 📱 Usage Examples
+## Usage Examples
 
 ### Connecting to LG
 
@@ -184,7 +184,7 @@ final kml = KMLBuilder()
 await service.sendKML(kml);
 ```
 
-## 🧪 Testing
+## Testing
 
 Run tests:
 ```bash
@@ -196,7 +196,7 @@ Run with coverage:
 flutter test --coverage
 ```
 
-## 📦 Dependencies
+## Dependencies
 
 - **flutter_riverpod** - State management
 - **dartssh2** - SSH connectivity
@@ -205,7 +205,7 @@ flutter test --coverage
 - **logger** - Logging
 - **shared_preferences** - Local storage
 
-## 🎯 Project Structure Best Practices
+## Project Structure Best Practices
 
 ### Domain Layer
 - Define business entities (immutable, Equatable)
@@ -222,20 +222,20 @@ flutter test --coverage
 - Build UI screens with ConsumerWidget
 - Handle state with StateNotifier
 
-## 🔒 Security Notes
+## Security Notes
 
 - **Never commit passwords** to version control
 - Use environment variables for sensitive data
 - Ensure SSH keys are properly secured
 - Validate all user inputs before sending to LG
 
-## 🌐 Network Requirements
+## Network Requirements
 
 - Device must be on the same network as the LG rig
 - SSH access must be enabled on the master machine
 - Firewall rules must allow SSH connections (port 22)
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Connection Failed
 - Verify IP address is correct
@@ -249,7 +249,7 @@ flutter test --coverage
 - Check Google Earth is running on LG
 - Review logs for error messages
 
-## 📚 Resources
+## Resources
 
 - [Liquid Galaxy Documentation](https://github.com/LiquidGalaxyLAB)
 - [Flutter Documentation](https://flutter.dev/docs)
@@ -257,7 +257,7 @@ flutter test --coverage
 - [KML Reference](https://developers.google.com/kml/documentation)
 - [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please follow these guidelines:
 
@@ -267,11 +267,11 @@ Contributions are welcome! Please follow these guidelines:
 4. Use the Review Agent to check your code
 5. Update documentation
 
-## 📄 License
+## License
 
 This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Liquid Galaxy LAB for the amazing platform and support
 - Google Summer of Code 2026 program
@@ -279,7 +279,7 @@ This project is licensed under the Apache License 2.0 - see the LICENSE file for
 - Riverpod community for state management guidance
 - Contributors and testers who helped improve this application
 
-## 📧 Contact
+## Contact
 
 For questions or support:
 - Open an issue on GitHub
@@ -290,7 +290,7 @@ For questions or support:
 
 <div align="center">
 
-**Built with ❤️ for Google Summer of Code 2026**
+**Built for Google Summer of Code 2026**
 
 [Documentation](docs/) | [Examples](examples/) | [Contributing](CONTRIBUTING.md)
 
