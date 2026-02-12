@@ -48,38 +48,66 @@ const List<City> _cities = [
 class CityTourState {
   final int? currentCityIndex;
   final bool isPlaying;
+  final int totalCities;
 
-  CityTourState({this.currentCityIndex, this.isPlaying = false});
+  CityTourState({
+    this.currentCityIndex, 
+    this.isPlaying = false,
+    this.totalCities = 0,
+  });
 }
 
 class CityTourViewModel extends StateNotifier<CityTourState> {
   final LGService _lgService;
   Timer? _tourTimer;
+  List<City> _currentTourCities = _cities; // Default to static list
 
   CityTourViewModel(this._lgService) : super(CityTourState());
 
-  Future<void> startTour() async {
+  Future<void> startTour({List<City>? customCities}) async {
     // 0. Clean slate
     stopTour();
     await _lgService.clearKML();
+
+    // Use custom cities if provided, otherwise default
+    if (customCities != null && customCities.isNotEmpty) {
+      _currentTourCities = customCities;
+    } else {
+      _currentTourCities = _cities;
+    }
     
-    state = CityTourState(currentCityIndex: 0, isPlaying: true);
+    state = CityTourState(
+      currentCityIndex: 0, 
+      isPlaying: true,
+      totalCities: _currentTourCities.length,
+    );
     
     // 1. Start immediately with the first city
-    // No wait for "master KML" anymore
     _playCity(0);
   }
 
   Future<void> _playCity(int index) async {
     if (!state.isPlaying) return;
     
-    final city = _cities[index];
+    if (index >= _currentTourCities.length) {
+      // Loop back to start
+      index = 0;
+    }
     
-    // 1. Fly to City immediately (User feedback: INSTANT)
-    // Duration: ~4 seconds for the rig to fly there
-    await _lgService.flyTo(city.latitude, city.longitude, 5000, 60, 0);
+    final city = _currentTourCities[index];
+    
+    // 1. Fly to City Overview (High Altitude: 10000m)
+    await _lgService.flyTo(city.latitude, city.longitude, 10000, 60, 0);
+    
+    // Wait for arrival at overview
+    await Future.delayed(const Duration(seconds: 5));
 
-    // 2. Show Info on Rightmost Screen
+    if (!state.isPlaying || state.currentCityIndex != index) return;
+
+    // 2. Zoom In (Low Altitude: 1000m)
+    await _lgService.flyTo(city.latitude, city.longitude, 1000, 60, 0);
+    
+    // 3. Show Info on Rightmost Screen (during zoom)
     final balloonKml = KMLBuilder.createBalloon(
       title: city.name,
       content: '''
@@ -94,8 +122,13 @@ class CityTourViewModel extends StateNotifier<CityTourState> {
     );
     await _lgService.sendBalloonToRightScreen(balloonKml);
 
-    // 3. Prepare unique Orbit Tour (Background upload)
-    // Use unique filename with timestamp to prevent caching issues
+    // Wait for zoom to complete
+    await Future.delayed(const Duration(seconds: 4));
+
+    if (!state.isPlaying || state.currentCityIndex != index) return;
+
+    // 4. Prepare unique Orbit Tour (Slow speed: 45s duration)
+    // The tour will be generated at the zoomed-in range (1000m)
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final tourName = 'Tour_${city.name.replaceAll(" ", "")}_$timestamp';
     final kmlFileName = 'tour_$timestamp.kml';
@@ -104,33 +137,30 @@ class CityTourViewModel extends StateNotifier<CityTourState> {
       tourName: tourName,
       latitude: city.latitude,
       longitude: city.longitude,
-      orbitDuration: 5.0, // Requested 5 seconds
+      range: 1000, // Explicitly match the zoom level
+      orbitDuration: 45.0, // Slower orbit speed
     );
     
-    // Upload while flying
     await _lgService.sendKML(tourKml, fileName: kmlFileName);
     
-    // 4. Wait for flight to finish + KML load buffer
-    // Fly starts at T=0. We waited for the command to send, but the rig is flying now.
-    // Let's give it 5 seconds total (4s flight + 1s buffer)
-    await Future.delayed(const Duration(seconds: 5));
+    // Allow KML to load
+    await Future.delayed(const Duration(seconds: 2));
 
     if (!state.isPlaying || state.currentCityIndex != index) return;
 
     // 5. Start Orbit
     await _lgService.startTour(tourName);
     
-    // 6. Wait for Orbit (5s) + Post-Orbit Wait (2s) = 7s
-    // Total wait before next city: 7 seconds
-    _tourTimer = Timer(const Duration(seconds: 7), () {
+    // 6. Wait for 15 seconds of orbiting, then move to next
+    _tourTimer = Timer(const Duration(seconds: 15), () {
         if (!state.isPlaying) return;
         
-        int nextIndex = state.currentCityIndex! + 1;
-        if (nextIndex >= _cities.length) {
-          nextIndex = 0;
-        }
-        
-        state = CityTourState(currentCityIndex: nextIndex, isPlaying: true);
+        int nextIndex = index + 1;
+        state = CityTourState(
+          currentCityIndex: nextIndex, 
+          isPlaying: true,
+          totalCities: _currentTourCities.length,
+        );
         _playCity(nextIndex);
     });
   }
@@ -141,6 +171,7 @@ class CityTourViewModel extends StateNotifier<CityTourState> {
     state = CityTourState(currentCityIndex: null, isPlaying: false);
     _lgService.cleanSlaves();
     _lgService.clearKML();
+    _currentTourCities = _cities; // Reset to default
   }
   
   @override

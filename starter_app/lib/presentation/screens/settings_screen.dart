@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/providers/shared_preferences_provider.dart';
 import '../../domain/entities/lg_connection.dart';
-import '../providers/lg_connection_provider.dart';
-import 'home_screen.dart';
-
 import '../../core/services/settings_service.dart';
+import '../providers/lg_connection_provider.dart';
 
-class ConnectionScreen extends ConsumerStatefulWidget {
-  const ConnectionScreen({super.key});
+class SettingsScreen extends ConsumerStatefulWidget {
+  const SettingsScreen({super.key});
 
   @override
-  ConsumerState<ConnectionScreen> createState() => _ConnectionScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _ConnectionScreenState extends ConsumerState<ConnectionScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  // API Key Controllers
+  final _apiKeyController = TextEditingController();
+  bool _obscureApiKey = true;
+
+  // Connection Controllers
   final _formKey = GlobalKey<FormState>();
   final _hostController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _portController = TextEditingController(text: '22');
   final _screenCountController = TextEditingController(text: '5');
+  bool _obscurePassword = true;
+
   final _settingsService = SettingsService();
 
   @override
@@ -29,22 +36,62 @@ class _ConnectionScreenState extends ConsumerState<ConnectionScreen> {
   }
 
   Future<void> _loadSettings() async {
+    // Load API Key
+    final prefs = ref.read(sharedPreferencesProvider);
+    final key = prefs.getString('gemini_api_key') ?? '';
+    _apiKeyController.text = key;
+
+    // Load Connection Settings
     final settings = await _settingsService.loadConnectionSettings();
-    if (settings != null) {
+    if (settings != null && mounted) {
+      setState(() {
+        _hostController.text = settings['host'];
+        _usernameController.text = settings['username'];
+        _passwordController.text = settings['password'];
+        _portController.text = settings['port'].toString();
+        _screenCountController.text = settings['screens'].toString();
+      });
+    }
+  }
+
+  Future<void> _saveSettings() async {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    
+    // Save API Key
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.setString('gemini_api_key', _apiKeyController.text.trim());
+
+    // Save Connection Settings
+    if (_formKey.currentState!.validate()) {
+      final host = _hostController.text.trim();
+      final port = int.parse(_portController.text);
+      final username = _usernameController.text.trim();
+      final password = _passwordController.text;
+      final screens = int.parse(_screenCountController.text);
+
+      await _settingsService.saveConnectionSettings(host, username, password, port, screens);
+      
+      // Connect to LG
+      final connection = LGConnection(
+        host: host,
+        port: port,
+        username: username,
+        password: password,
+        screenCount: screens,
+      );
+      ref.read(lgConnectionProvider.notifier).connect(connection);
+      
       if (mounted) {
-        setState(() {
-          _hostController.text = settings['host'];
-          _usernameController.text = settings['username'];
-          _passwordController.text = settings['password'];
-          _portController.text = settings['port'].toString();
-          _screenCountController.text = settings['screens'].toString();
-        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Settings Saved & Connecting to LG...')),
+        );
       }
     }
   }
 
   @override
   void dispose() {
+    _apiKeyController.dispose();
     _hostController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
@@ -53,53 +100,13 @@ class _ConnectionScreenState extends ConsumerState<ConnectionScreen> {
     super.dispose();
   }
 
-  Future<void> _connect() async {
-    if (_formKey.currentState!.validate()) {
-      final host = _hostController.text.trim();
-      final port = int.parse(_portController.text);
-      final username = _usernameController.text.trim();
-      final password = _passwordController.text;
-      final screens = int.parse(_screenCountController.text);
-
-      final connection = LGConnection(
-        host: host,
-        port: port,
-        username: username,
-        password: password,
-        screenCount: screens,
-      );
-
-      await _settingsService.saveConnectionSettings(host, username, password, port, screens);
-      ref.read(lgConnectionProvider.notifier).connect(connection);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final connectionState = ref.watch(lgConnectionProvider);
 
-    // Navigate to home screen when connected
-    ref.listen<LGConnectionState>(lgConnectionProvider, (previous, next) {
-      if (next.isConnected && !next.isLoading) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
-      }
-      
-      if (next.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-        ref.read(lgConnectionProvider.notifier).clearError();
-      }
-    });
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('LG Connection'),
+        title: const Text('Settings'),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -133,6 +140,27 @@ class _ConnectionScreenState extends ConsumerState<ConnectionScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
+              
+              // API Key Field - Added here
+              TextFormField(
+                controller: _apiKeyController,
+                obscureText: _obscureApiKey,
+                decoration: InputDecoration(
+                  labelText: 'Gemini API Key',
+                  prefixIcon: const Icon(Icons.key),
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscureApiKey ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        _obscureApiKey = !_obscureApiKey;
+                      });
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
               TextFormField(
                 controller: _hostController,
                 decoration: const InputDecoration(
@@ -167,11 +195,15 @@ class _ConnectionScreenState extends ConsumerState<ConnectionScreen> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
+                obscureText: _obscurePassword,
+                decoration: InputDecoration(
                   labelText: 'Password',
-                  prefixIcon: Icon(Icons.lock),
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.lock),
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -228,8 +260,9 @@ class _ConnectionScreenState extends ConsumerState<ConnectionScreen> {
                 ],
               ),
               const SizedBox(height: 32),
+              
               ElevatedButton(
-                onPressed: connectionState.isLoading ? null : _connect,
+                onPressed: connectionState.isLoading ? null : _saveSettings,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
@@ -244,6 +277,16 @@ class _ConnectionScreenState extends ConsumerState<ConnectionScreen> {
                         style: TextStyle(fontSize: 16),
                       ),
               ),
+              
+              if (connectionState.errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Text(
+                    connectionState.errorMessage!,
+                    style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
             ],
           ),
         ),

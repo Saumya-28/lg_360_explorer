@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/utils/kml_builder.dart';
 import '../providers/lg_connection_provider.dart';
 import '../widgets/connection_status_widget.dart';
-import 'connection_screen.dart';
+import 'settings_screen.dart';
 import 'explore_cities_screen.dart';
+import '../widgets/chat_overlay.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -22,9 +23,10 @@ class HomeScreen extends ConsumerWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ConnectionScreen()),
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
               );
             },
+            tooltip: 'Settings',
           ),
         ],
       ),
@@ -55,6 +57,23 @@ class HomeScreen extends ConsumerWidget {
             ),
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: const ChatOverlay(),
+            ),
+          );
+        },
+        backgroundColor: Colors.deepPurpleAccent,
+        child: const Icon(Icons.auto_awesome, color: Colors.white),
       ),
     );
   }
@@ -184,10 +203,10 @@ class HomeScreen extends ConsumerWidget {
         },
       ),
       _LGActionCard(
-        title: 'Explore Cities',
-        description: 'Take a tour of amazing cities',
-        icon: Icons.travel_explore,
-        color: Colors.pinkAccent,
+        title: 'City Heatmaps',
+        description: 'Visualize live temperature data',
+        icon: Icons.thermostat,
+        color: Colors.orangeAccent,
         onPressed: () {
           Navigator.push(
             context,

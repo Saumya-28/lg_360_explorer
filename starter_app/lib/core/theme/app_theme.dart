@@ -6,6 +6,7 @@ class AppTheme {
   static const Color _background = Color(0xFF121212);
   static const Color _surface = Color(0xFF1E1E1E);
   static const Color _primary = Color(0xFF448AFF); // Electric Blue
+  static const Color primaryColor = _primary; // Expose for widgets
   static const Color _secondary = Color(0xFF69F0AE); // Green Accent
   static const Color _error = Color(0xFFCF6679);
   

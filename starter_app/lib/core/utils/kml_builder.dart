@@ -396,4 +396,93 @@ class KMLBuilder {
   </Document>
 </kml>''';
   }
+  /// Creates a gradient heatmap using concentric circles with varying opacity
+  static String createHeatmapGradient({
+    required double latitude,
+    required double longitude,
+    required double radius, // Max radius in meters
+    required String colorHex, // RRGGBB (without alpha)
+    String name = 'Heatmap Area',
+  }) {
+    // Generate scale factors
+    double latScale = 1 / 111320;
+    double lonScale = 1 / (40075000 * math.cos(latitude * math.pi / 180) / 360);
+
+    StringBuffer kmlContent = StringBuffer();
+    kmlContent.write('''<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>$name</name>
+''');
+
+    // Create 5 concentric circles
+    // Layer 1 (Outer): 100% radius, 20% opacity
+    // Layer 2: 80% radius, +20% opacity
+    // ...
+    // Layer 5 (Inner): 20% radius, +20% opacity
+    // Since KML polygons stack, the center will naturally be most opaque.
+    
+    // KML Color format: AABBGGRR. Input colorHex is RRGGBB.
+    // We need to convert RRGGBB to BBGGRR.
+    String rr = colorHex.substring(0, 2);
+    String gg = colorHex.substring(2, 4);
+    String bb = colorHex.substring(4, 6);
+    String bbggrr = '$bb$gg$rr';
+
+    // Opacity steps (Hex): 20% ~= 33, 15% ~= 26
+    List<String> opacities = ['33', '33', '33', '33', '33']; // Stacked 20% layers
+    List<double> radiusFactors = [1.0, 0.8, 0.6, 0.4, 0.2];
+
+    for (int i = 0; i < 5; i++) {
+        String styleId = 'heatmap_style_$i';
+        String alpha = opacities[i];
+        String kmlColor = '$alpha$bbggrr';
+        double currentRadius = radius * radiusFactors[i];
+
+        kmlContent.write('''
+    <Style id="$styleId">
+      <PolyStyle>
+        <color>$kmlColor</color>
+        <fill>1</fill>
+        <outline>0</outline>
+      </PolyStyle>
+    </Style>
+    <Placemark>
+      <name>${name}_Layer_$i</name>
+      <styleUrl>#$styleId</styleUrl>
+      <Polygon>
+        <altitudeMode>clampToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+''');
+
+      // Generate circle points
+      int steps = 36;
+      for (int j = 0; j <= steps; j++) {
+        double angle = (2 * math.pi * j) / steps;
+        double dx = currentRadius * math.cos(angle);
+        double dy = currentRadius * math.sin(angle);
+
+        double pLat = latitude + dy * latScale;
+        double pLon = longitude + dx * lonScale;
+
+        kmlContent.write('$pLon,$pLat,0 ');
+      }
+
+      kmlContent.write('''
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+''');
+    }
+
+    kmlContent.write('''
+  </Document>
+</kml>''');
+
+    return kmlContent.toString();
+  }
 }
